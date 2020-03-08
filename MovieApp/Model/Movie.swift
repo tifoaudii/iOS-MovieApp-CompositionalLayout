@@ -15,7 +15,7 @@ public struct MoviesResponse: Codable {
     public let results: [Movie]
 }
 
-public struct Movie: Codable {
+public struct Movie: Codable, Hashable {
     
     public let id: Int
     public let title: String
@@ -41,6 +41,14 @@ public struct Movie: Codable {
     
     public var voteAveragePercentText: String {
         return "\(Int(voteAverage * 10))%"
+    }
+    
+    public static func == (lhs: Movie, rhs: Movie) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
     
 }
