@@ -61,147 +61,31 @@ extension MovieViewController {
    }
    
    func setupCollectionViewLayout() -> UICollectionViewLayout {
-      let layout = UICollectionViewCompositionalLayout { (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
-         
-         let movieSections = MovieSection.allCases[sectionIndex]
-         switch movieSections {
-         case .topRated: return self.createTopRatedMovieSection()
-         case .onGoing: return self.createOnGoingMovieSection()
-         case .upcoming: return self.createUpcomingMovieSection()
-         case .popular: return self.createPopularMovieSection()
-         }
-      }
-      return layout
+      //MARK:- 1. Define the layout
    }
    
    fileprivate func setupDataSource() {
-      movieDataSource = UICollectionViewDiffableDataSource<MovieSection, Movie>(collectionView: movieCollectionView, cellProvider: { (collectionView, indexPath, movie) -> UICollectionViewCell? in
-         
-         let movieSections = MovieSection.allCases[indexPath.section]
-         switch movieSections {
-         case .topRated:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TopRatedMovieCell.cellIdentifier, for: indexPath) as? TopRatedMovieCell else {
-               return TopRatedMovieCell()
-            }
-            cell.movie = movie
-            return cell
-         case .onGoing:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: OnGoingMovieCell.cellIdentifier, for: indexPath) as? OnGoingMovieCell else {
-               return OnGoingMovieCell()
-            }
-            cell.movie = movie
-            return cell
-         case .upcoming:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UpcomingMovieCell.cellIdentifier, for: indexPath) as? UpcomingMovieCell else {
-               return UpcomingMovieCell()
-            }
-            cell.movie = movie
-            return cell
-         case .popular:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularMovieCell.cellIdentifier, for: indexPath) as? PopularMovieCell else {
-               return PopularMovieCell()
-            }
-            cell.movie = movie
-            return cell
-         }
-      })
-      
-      movieDataSource?.supplementaryViewProvider = {
-         (collectionView, kind, indexPath) -> UICollectionReusableView? in
-         guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(
-           ofKind: kind,
-           withReuseIdentifier: HeaderView.reuseIdentifier,
-           for: indexPath) as? HeaderView else { fatalError("Cannot create header view") }
-
-         supplementaryView.label.text = MovieSection.allCases[indexPath.section].rawValue
-         return supplementaryView
-      }
-      
-      movieDataSource?.apply(generateSnapshot(), animatingDifferences: false, completion: nil)
+      //MARK:- 2. Define the data source
    }
    
    func generateSnapshot() -> NSDiffableDataSourceSnapshot<MovieSection, Movie> {
-      var snapshot = NSDiffableDataSourceSnapshot<MovieSection, Movie>()
-      
-      snapshot.appendSections([MovieSection.topRated])
-      snapshot.appendItems(viewModel.topRatedMovies)
-      
-      snapshot.appendSections([MovieSection.onGoing])
-      snapshot.appendItems(viewModel.ongoingMovies)
-      
-      snapshot.appendSections([MovieSection.upcoming])
-      snapshot.appendItems(viewModel.upcomingMovies)
-
-      snapshot.appendSections([MovieSection.popular])
-      snapshot.appendItems(viewModel.popularMovies)
-      
-      return snapshot
+      //MARK:- 3. Define the snapshot
    }
    
    fileprivate func createTopRatedMovieSection() -> NSCollectionLayoutSection {
-      let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(1.0))
-      let item = NSCollectionLayoutItem(layoutSize: itemSize)
-      let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(140), heightDimension: .absolute(220))
-      let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitem: item, count: 1)
-      group.contentInsets = .init(top: 5, leading: 5, bottom: 5, trailing: 5)
-      
-      let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-      heightDimension: .estimated(44))
-      let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: MovieViewController.sectionHeaderElementKind, alignment: .top)
-      
-      let section = NSCollectionLayoutSection(group: group)
-      section.orthogonalScrollingBehavior = .groupPaging
-      section.boundarySupplementaryItems = [sectionHeader]
-      return section
+      //MARK:- 4. Define the top rated movie layout section
    }
    
    fileprivate func createOnGoingMovieSection() -> NSCollectionLayoutSection {
-      let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(2/3))
-      let item = NSCollectionLayoutItem(layoutSize: itemSize)
-      let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(1.0))
-      let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitem: item, count: 3)
-      group.contentInsets = .init(top: 5, leading: 0, bottom: 5, trailing: 20)
-      
-      let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-      heightDimension: .estimated(44))
-      let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: MovieViewController.sectionHeaderElementKind, alignment: .top)
-      
-      let section = NSCollectionLayoutSection(group: group)
-      section.orthogonalScrollingBehavior = .groupPaging
-      section.boundarySupplementaryItems = [sectionHeader]
-      return section
+      //MARK:- 5. Define the ongoing movie layout section
    }
    
    fileprivate func createUpcomingMovieSection() -> NSCollectionLayoutSection {
-      let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
-      let item = NSCollectionLayoutItem(layoutSize: itemSize)
-      let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(0.75))
-      let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 2)
-      group.contentInsets = .init(top: 5, leading: 5, bottom: 5, trailing: 5)
-      
-      let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-      heightDimension: .estimated(44))
-      let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: MovieViewController.sectionHeaderElementKind, alignment: .top)
-      
-      let section = NSCollectionLayoutSection(group: group)
-      section.boundarySupplementaryItems = [sectionHeader]
-      return section
+      //MARK:- 6. Define the upcoming movie layout section
    }
    
    fileprivate func createPopularMovieSection() -> NSCollectionLayoutSection {
-      let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(1.0))
-      let item = NSCollectionLayoutItem(layoutSize: itemSize)
-      let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(1.5))
-      let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitem: item, count: 1)
-      group.contentInsets = .init(top: 5, leading: 5, bottom: 5, trailing: 5)
-      
-      let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-      heightDimension: .estimated(44))
-      let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: MovieViewController.sectionHeaderElementKind, alignment: .top)
-      
-      let section = NSCollectionLayoutSection(group: group)
-      section.boundarySupplementaryItems = [sectionHeader]
-      return section
+      //MARK:- 7. Define the popular movie layout section
    }
    
 }
